@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">MyArchitecture</string>
+    <string name="title_activity_main">MainActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="group_price">%s元/㎡</string>
+    <string name="group_people">已参加：%s人</string>
+    <string name="rental_type">%1$s室%2$s厅%3$s卫</string>
+    <string name="rental_area">%s平米</string>
+    <string name="rental_price">%s元/月</string>
+</resources>
