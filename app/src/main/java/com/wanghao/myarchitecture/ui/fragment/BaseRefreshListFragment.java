@@ -294,6 +294,12 @@ public abstract class BaseRefreshListFragment<T> extends BaseFragment{
         }
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
+    }
+
     protected abstract TYPE_LAYOUT getLayoutType();
 
     protected abstract HeaderBottomItemAdapter<T> getAdapter();
