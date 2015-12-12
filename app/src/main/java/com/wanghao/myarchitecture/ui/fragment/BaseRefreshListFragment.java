@@ -11,7 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -22,20 +23,11 @@ import com.wanghao.myarchitecture.network.GsonRequest;
 import com.wanghao.myarchitecture.utils.NetUtils;
 import com.wanghao.myarchitecture.view.LoadingFooter;
 import com.wanghao.myarchitecture.view.LoadingLayout;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
-
-import butterknife.Bind;
-import butterknife.ButterKnife;
 import in.srain.cube.views.ptr.PtrClassicFrameLayout;
 import in.srain.cube.views.ptr.PtrDefaultHandler;
 import in.srain.cube.views.ptr.PtrFrameLayout;
 import in.srain.cube.views.ptr.PtrHandler;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import java.util.ArrayList;
 
 /**
  * Created by wanghao on 2015/9/23.
@@ -47,6 +39,7 @@ public abstract class BaseRefreshListFragment<T> extends BaseFragment{
     private LoadingFooter mLoadingFooter;
     protected ArrayList<T> data;
     private HeaderBottomItemAdapter<T> adapter;
+    private ArrayList<T> result = new ArrayList<T>();
     private boolean isInitLoad = true;//是否第一次加载
     private int mPage = 0;
     private int mCount = 16;
@@ -176,60 +169,34 @@ public abstract class BaseRefreshListFragment<T> extends BaseFragment{
 
     private void loadData(final int page) {
         final boolean isRefreshFromTop = page == 0;
+
         GsonRequest<T[]> request = new GsonRequest<T[]>(String.format(getUrlString(), page, mCount), getDataType(),
                 new Response.Listener<T[]>() {
 
                     @Override
                     public void onResponse(final T[] response) {
-
-                        Observable.create(new Observable.OnSubscribe<LinkedList<T>>() {
-                            @Override
-                            public void call(Subscriber<? super LinkedList<T>> subscriber) {
-                                        LinkedList<T> temp = new LinkedList<T>();
-                                        for (T object : response) {
-                                            temp.add(object);
-                                        }
-                                        subscriber.onNext(temp);
-                                        subscriber.onCompleted();
-                                    }
-                                })
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(new Subscriber<LinkedList<T>>() {
-                                    @Override
-                                    public void onCompleted() {
-                                        adapter.notifyDataSetChanged();
-                                    }
-
-                                    @Override
-                                    public void onError(Throwable e) {
-
-                                    }
-
-                                    @Override
-                                    public void onNext(LinkedList<T> result) {
-
-                                        if (isRefreshFromTop) {
-                                            data.clear();
-                                            if (isInitLoad) {
-                                                if (result.isEmpty()){
-                                                    loadingLayout.showEmpty();
-                                                }else {
-                                                    loadingLayout.showContent();
-                                                }
-                                            }else {
-                                                mPtrFrame.refreshComplete();
-                                            }
-                                        }
-                                        if (result.size() < mCount) {
-                                            mLoadingFooter.setState(LoadingFooter.State.TheEnd);
-                                        } else {
-                                            mLoadingFooter.setState(LoadingFooter.State.Idle);
-                                        }
-                                        mPage = page;
-                                        data.addAll(result);
-                                    }
-                                });
+                        for (T t:response) result.add(t);
+                        if (isRefreshFromTop) {
+                            data.clear();
+                            if (isInitLoad) {
+                                if (result.isEmpty()){
+                                    loadingLayout.showEmpty();
+                                }else {
+                                    loadingLayout.showContent();
+                                }
+                            }else {
+                                mPtrFrame.refreshComplete();
+                            }
+                        }
+                        if (result.size() < mCount) {
+                            mLoadingFooter.setState(LoadingFooter.State.TheEnd);
+                        } else {
+                            mLoadingFooter.setState(LoadingFooter.State.Idle);
+                        }
+                        mPage = page;
+                        data.addAll(result);
+                        adapter.notifyDataSetChanged();
+                        result.clear();
                     }
                 }, new Response.ErrorListener() {
 
