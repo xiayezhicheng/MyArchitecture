@@ -1,8 +1,6 @@
 package com.wanghao.myarchitecture.bean;
 
-
 import android.databinding.Bindable;
-
 import com.wanghao.myarchitecture.BR;
 
 /**
@@ -121,6 +119,5 @@ public class Group extends BaseModel{
         this.alarm_id = alarm_id;
         notifyPropertyChanged(BR.alarm_id);
     }
-
 
 }

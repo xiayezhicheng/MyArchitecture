@@ -2,6 +2,7 @@ package com.wanghao.myarchitecture.ui.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
@@ -13,14 +14,12 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.wanghao.myarchitecture.R;
 import com.wanghao.myarchitecture.adapter.HeaderBottomItemAdapter;
 import com.wanghao.myarchitecture.enums.TYPE_LAYOUT;
-import com.wanghao.myarchitecture.network.GsonRequest;
+import com.wanghao.myarchitecture.utils.Config;
 import com.wanghao.myarchitecture.utils.NetUtils;
+import com.wanghao.myarchitecture.utils.RxUtils;
 import com.wanghao.myarchitecture.view.LoadingFooter;
 import com.wanghao.myarchitecture.view.LoadingLayout;
 import in.srain.cube.views.ptr.PtrClassicFrameLayout;
@@ -28,23 +27,27 @@ import in.srain.cube.views.ptr.PtrDefaultHandler;
 import in.srain.cube.views.ptr.PtrFrameLayout;
 import in.srain.cube.views.ptr.PtrHandler;
 import java.util.ArrayList;
+import java.util.List;
+import rx.Observable;
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.subscriptions.CompositeSubscription;
 
 /**
  * Created by wanghao on 2015/9/23.
  */
-public abstract class BaseRefreshListFragment<T> extends BaseFragment{
+public abstract class BaseRefreshListFragment<T> extends Fragment {
 
     private Context context;
     private GridLayoutManager gridLayoutManager;
     private LoadingFooter mLoadingFooter;
     protected ArrayList<T> data;
     private HeaderBottomItemAdapter<T> adapter;
-    private ArrayList<T> result = new ArrayList<T>();
     private boolean isInitLoad = true;//是否第一次加载
     private int mPage = 0;
-    private int mCount = 16;
     private boolean isVisible ;
     private boolean isInit ;
+    private CompositeSubscription subscription = new CompositeSubscription();
 
     @Bind(R.id.rotate_header_list_view_frame) PtrClassicFrameLayout mPtrFrame;
     @Bind(R.id.recyclerView) RecyclerView mRecyclerView;
@@ -57,6 +60,7 @@ public abstract class BaseRefreshListFragment<T> extends BaseFragment{
         context = getActivity();
         View view = inflater.inflate(R.layout.ptr_list, container,false);
         ButterKnife.bind(this,view);
+
         //加载视图展示
         loadingLayout.setOnRetryClickListener(new View.OnClickListener() {
             @Override
@@ -165,21 +169,44 @@ public abstract class BaseRefreshListFragment<T> extends BaseFragment{
         }
     };
 
-
-
     private void loadData(final int page) {
         final boolean isRefreshFromTop = page == 0;
 
-        GsonRequest<T[]> request = new GsonRequest<T[]>(String.format(getUrlString(), page, mCount), getDataType(),
-                new Response.Listener<T[]>() {
+        subscription.add(loadObservable(page)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<T>>() {
+                    @Override public void onCompleted() {
+                        adapter.notifyDataSetChanged();
+                    }
 
-                    @Override
-                    public void onResponse(final T[] response) {
-                        for (T t:response) result.add(t);
+                    @Override public void onError(Throwable e) {
+                        if (isRefreshFromTop) {
+                            if(isInitLoad){
+                                loadingLayout.showError();
+                            }else{
+                                mPtrFrame.refreshComplete();
+                            }
+                        } else {
+                            mLoadingFooter.setState(LoadingFooter.State.Idle);
+                        }
+                        if (!NetUtils.isConnect(getActivity())) {
+                            if(isRefreshFromTop){
+                                if (data.isEmpty()) {
+                                    loadingLayout.showUnnet();
+                                }else {
+                                    Toast.makeText(getActivity(), "网络异常，请稍后重试", Toast.LENGTH_SHORT).show();
+                                }
+                            }else{
+                                mLoadingFooter.setState(LoadingFooter.State.InvalidateNet);
+                            }
+                        }
+                    }
+
+                    @Override public void onNext(List<T> groups) {
                         if (isRefreshFromTop) {
                             data.clear();
                             if (isInitLoad) {
-                                if (result.isEmpty()){
+                                if (groups.isEmpty()){
                                     loadingLayout.showEmpty();
                                 }else {
                                     loadingLayout.showContent();
@@ -188,49 +215,16 @@ public abstract class BaseRefreshListFragment<T> extends BaseFragment{
                                 mPtrFrame.refreshComplete();
                             }
                         }
-                        if (result.size() < mCount) {
+                        if (groups.size() < Config.LIST_COUNT) {
                             mLoadingFooter.setState(LoadingFooter.State.TheEnd);
                         } else {
                             mLoadingFooter.setState(LoadingFooter.State.Idle);
                         }
                         mPage = page;
-                        data.addAll(result);
-                        adapter.notifyDataSetChanged();
-                        result.clear();
+                        data.addAll(groups);
                     }
-                }, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                if (isRefreshFromTop) {
-                    if(isInitLoad){
-                        loadingLayout.showError();
-                    }else{
-                        mPtrFrame.refreshComplete();
-                    }
-                } else {
-                    mLoadingFooter.setState(LoadingFooter.State.Idle);
-                }
-                if (!NetUtils.isConnect(context)) {
-                    if(isRefreshFromTop){
-                        if (data.isEmpty()) {
-                            loadingLayout.showUnnet();
-                        }else {
-                            Toast.makeText(context, "网络异常，请稍后重试", Toast.LENGTH_SHORT).show();
-                        }
-                    }else{
-                        mLoadingFooter.setState(LoadingFooter.State.InvalidateNet);
-                    }
-                }
-
-            }
-        }
+                })
         );
-
-        request.setRetryPolicy(new DefaultRetryPolicy(20 * 1000, 2, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        executeRequest(request);
-
     }
 
     private void loadNextPage() {
@@ -261,6 +255,17 @@ public abstract class BaseRefreshListFragment<T> extends BaseFragment{
         }
     }
 
+    @Override public void onResume() {
+        super.onResume();
+        subscription = RxUtils.getNewCompositeSubIfUnsubscribed(subscription);
+
+    }
+
+    @Override public void onPause() {
+        super.onPause();
+        RxUtils.unsubscribeIfNotNull(subscription);
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -271,7 +276,5 @@ public abstract class BaseRefreshListFragment<T> extends BaseFragment{
 
     protected abstract HeaderBottomItemAdapter<T> getAdapter();
 
-    protected abstract Class<T[]> getDataType();
-
-    protected abstract String getUrlString();
+    protected abstract Observable<List<T>> loadObservable(int page);
 }
