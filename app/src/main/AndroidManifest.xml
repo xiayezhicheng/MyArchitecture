@@ -15,18 +15,25 @@
 
     <application
         android:allowBackup="true"
+        android:exported="false"
         android:icon="@mipmap/ic_launcher"
         android:name=".CustomApplication"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
             android:name=".ui.activity.MainActivity"
-            android:label="@string/title_activity_main" >
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.activity.DetailMsgActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>
 

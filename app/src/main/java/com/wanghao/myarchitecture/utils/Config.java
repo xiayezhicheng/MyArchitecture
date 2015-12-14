@@ -16,4 +16,8 @@ public class Config {
     public static final int OKHTTP_CLIENT_WRITE_TIMEOUT = 5;
     public static final int OKHTTP_CLIENT_READ_TIMEOUT = 5;
 
+
+    //Bundle的key
+    public static final String Key_House_Title = "key_house_title";
+    public static final String Key_House_Img = "key_house_img";
 }
