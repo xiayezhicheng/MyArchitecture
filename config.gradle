@@ -1,0 +1,38 @@
+ext {
+
+    android = [
+            androidBuildTools : "23.0.2",
+            androidMinSdk     : 15,
+            androidTargetSdk  : 23,
+            androidCompileSdk : 23,
+            applicationId     : "com.wanghao.myarchitecture",
+            versionCode       : 1,
+            versionName       : "1.0"
+    ]
+
+    //Libraries
+    androidSupport = "23.1.1"
+    rxJava = '1.0.16'
+    rxAndroid = '1.0.1'
+    retrofit = "2.0.0-beta1"//用2.0.0-beta2显示不出数据，why？
+    uil = "1.9.5"
+    butterKnife = '7.0.1'
+    ultraPtr = "1.0.11"
+
+    libs = [
+            supportV4           : "com.android.support:support-v4:${androidSupport}",
+            appcompat           : "com.android.support:appcompat-v7:${androidSupport}",
+            recyclerView        : "com.android.support:recyclerview-v7:${androidSupport}",
+            cardView            : "com.android.support:cardview-v7:${androidSupport}",
+            supportDesign       : "com.android.support:design:${androidSupport}",
+            rxJava              : "io.reactivex:rxjava:${rxJava}",
+            rxAndroid           : "io.reactivex:rxandroid:${rxAndroid}",
+            retrofit            : "com.squareup.retrofit:retrofit:${retrofit}",
+            retrofitWithGson    : "com.squareup.retrofit:converter-gson:${retrofit}",
+            retrofitWithRxJava  : "com.squareup.retrofit:adapter-rxjava:${retrofit}",
+            uil                 : "com.nostra13.universalimageloader:universal-image-loader:${uil}",
+            butterKnife         : "com.jakewharton:butterknife:${butterKnife}",
+            ultraPtr            : "in.srain.cube:ultra-ptr:${ultraPtr}"
+    ]
+
+}

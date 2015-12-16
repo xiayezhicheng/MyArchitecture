@@ -2,7 +2,6 @@ package com.wanghao.myarchitecture.ui.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
@@ -12,31 +11,29 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-import butterknife.Bind;
-import butterknife.ButterKnife;
+
 import com.wanghao.myarchitecture.R;
 import com.wanghao.myarchitecture.adapter.HeaderBottomItemAdapter;
 import com.wanghao.myarchitecture.enums.TYPE_LAYOUT;
+import com.wanghao.myarchitecture.ui.base.SwipeRefreshBaseFragment;
 import com.wanghao.myarchitecture.utils.Config;
 import com.wanghao.myarchitecture.utils.NetUtils;
-import com.wanghao.myarchitecture.utils.RxUtils;
 import com.wanghao.myarchitecture.view.LoadingFooter;
 import com.wanghao.myarchitecture.view.LoadingLayout;
-import in.srain.cube.views.ptr.PtrClassicFrameLayout;
-import in.srain.cube.views.ptr.PtrDefaultHandler;
-import in.srain.cube.views.ptr.PtrFrameLayout;
-import in.srain.cube.views.ptr.PtrHandler;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import rx.Observable;
-import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.subscriptions.CompositeSubscription;
+import rx.functions.Action1;
 
 /**
  * Created by wanghao on 2015/9/23.
  */
-public abstract class BaseRefreshListFragment<T> extends Fragment {
+public abstract class BaseRefreshListFragment<T> extends SwipeRefreshBaseFragment {
 
     private Context context;
     private GridLayoutManager gridLayoutManager;
@@ -47,9 +44,7 @@ public abstract class BaseRefreshListFragment<T> extends Fragment {
     private int mPage = 0;
     private boolean isVisible ;
     private boolean isInit ;
-    private CompositeSubscription subscription = new CompositeSubscription();
 
-    @Bind(R.id.rotate_header_list_view_frame) PtrClassicFrameLayout mPtrFrame;
     @Bind(R.id.recyclerView) RecyclerView mRecyclerView;
     @Bind(R.id.loading_layout) LoadingLayout loadingLayout;
 
@@ -103,28 +98,6 @@ public abstract class BaseRefreshListFragment<T> extends Fragment {
             });
         }
 
-        mPtrFrame.setLastUpdateTimeRelateObject(this);
-        mPtrFrame.setPtrHandler(new PtrHandler() {
-            @Override
-            public void onRefreshBegin(PtrFrameLayout frame) {
-                isInitLoad = false;
-                loadFirstPage();
-            }
-
-            @Override
-            public boolean checkCanDoRefresh(PtrFrameLayout frame, View content, View header) {
-                return PtrDefaultHandler.checkContentCanBePulledDown(frame, content, header);
-            }
-        });
-        // the following are default settings
-        mPtrFrame.setResistance(1.7f);
-        mPtrFrame.setRatioOfHeaderHeightToRefresh(1.2f);
-        mPtrFrame.setDurationToClose(200);
-        mPtrFrame.setDurationToCloseHeader(1000);
-        // default is false(release to refresh )true is mean pulling to refresh
-        mPtrFrame.setPullToRefresh(false);
-        // default is true
-        mPtrFrame.setKeepHeaderWhenRefresh(true);
 
         mRecyclerView.addOnScrollListener(recyclerScrollListener);
 
@@ -172,14 +145,36 @@ public abstract class BaseRefreshListFragment<T> extends Fragment {
     private void loadData(final int page) {
         final boolean isRefreshFromTop = page == 0;
 
-        subscription.add(loadObservable(page)
+        addSubscription(loadObservable(page)
+                .retry(2)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<List<T>>() {
-                    @Override public void onCompleted() {
+                .subscribe(new Action1<List<T>>() {
+                    @Override
+                    public void call(List<T> lists) {
+                        if (isRefreshFromTop) {
+                            data.clear();
+                            if (isInitLoad) {
+                                if (lists.isEmpty()){
+                                    loadingLayout.showEmpty();
+                                }else {
+                                    loadingLayout.showContent();
+                                }
+                            }else {
+                                mPtrFrame.refreshComplete();
+                            }
+                        }
+                        if (lists.size() < Config.LIST_COUNT) {
+                            mLoadingFooter.setState(LoadingFooter.State.TheEnd);
+                        } else {
+                            mLoadingFooter.setState(LoadingFooter.State.Idle);
+                        }
+                        mPage = page;
+                        data.addAll(lists);
                         adapter.notifyDataSetChanged();
                     }
-
-                    @Override public void onError(Throwable e) {
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
                         if (isRefreshFromTop) {
                             if(isInitLoad){
                                 loadingLayout.showError();
@@ -201,30 +196,14 @@ public abstract class BaseRefreshListFragment<T> extends Fragment {
                             }
                         }
                     }
-
-                    @Override public void onNext(List<T> groups) {
-                        if (isRefreshFromTop) {
-                            data.clear();
-                            if (isInitLoad) {
-                                if (groups.isEmpty()){
-                                    loadingLayout.showEmpty();
-                                }else {
-                                    loadingLayout.showContent();
-                                }
-                            }else {
-                                mPtrFrame.refreshComplete();
-                            }
-                        }
-                        if (groups.size() < Config.LIST_COUNT) {
-                            mLoadingFooter.setState(LoadingFooter.State.TheEnd);
-                        } else {
-                            mLoadingFooter.setState(LoadingFooter.State.Idle);
-                        }
-                        mPage = page;
-                        data.addAll(groups);
-                    }
                 })
         );
+    }
+
+    @Override
+    public void onBeginRefresh() {
+        isInitLoad = false;
+        loadFirstPage();
     }
 
     private void loadNextPage() {
@@ -255,16 +234,6 @@ public abstract class BaseRefreshListFragment<T> extends Fragment {
         }
     }
 
-    @Override public void onResume() {
-        super.onResume();
-        subscription = RxUtils.getNewCompositeSubIfUnsubscribed(subscription);
-
-    }
-
-    @Override public void onPause() {
-        super.onPause();
-        RxUtils.unsubscribeIfNotNull(subscription);
-    }
 
     @Override
     public void onDestroyView() {

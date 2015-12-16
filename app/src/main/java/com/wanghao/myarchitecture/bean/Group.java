@@ -1,6 +1,8 @@
 package com.wanghao.myarchitecture.bean;
 
+
 import android.databinding.Bindable;
+
 import com.wanghao.myarchitecture.BR;
 
 /**
