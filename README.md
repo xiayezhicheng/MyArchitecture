@@ -1,0 +1,3 @@
+# MyArchitecture
+一个Android开发框架
+更新的功能添加请查阅retrofit
