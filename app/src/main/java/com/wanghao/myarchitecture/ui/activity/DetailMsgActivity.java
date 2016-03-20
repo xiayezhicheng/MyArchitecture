@@ -30,11 +30,6 @@ public class DetailMsgActivity extends ToolbarActivity {
 
 
     @Override
-    public int provideContentViewId() {
-        return R.layout.activity_detail_msg;
-    }
-
-    @Override
     public boolean canBack() {
         return true;
     }
@@ -44,6 +39,11 @@ public class DetailMsgActivity extends ToolbarActivity {
         ButterKnife.bind(this);
         init();
         loadData();
+    }
+
+    @Override
+    protected int getLayoutResId() {
+        return R.layout.activity_detail_msg;
     }
 
     private void init() {
@@ -64,5 +64,6 @@ public class DetailMsgActivity extends ToolbarActivity {
         mTvSource.setText(title);
         ImageLoader.getInstance().displayImage(imgUrl,mIvHeader);
     }
+
 
 }

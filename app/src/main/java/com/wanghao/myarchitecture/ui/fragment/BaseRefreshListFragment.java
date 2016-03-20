@@ -26,9 +26,8 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
+import rx.Subscriber;
+import rx.Subscription;
 
 /**
  * Created by wanghao on 2015/9/23.
@@ -98,7 +97,6 @@ public abstract class BaseRefreshListFragment<T> extends SwipeRefreshBaseFragmen
             });
         }
 
-
         mRecyclerView.addOnScrollListener(recyclerScrollListener);
 
         //延迟加载
@@ -143,61 +141,65 @@ public abstract class BaseRefreshListFragment<T> extends SwipeRefreshBaseFragmen
     };
 
     private void loadData(final int page) {
+
         final boolean isRefreshFromTop = page == 0;
 
-        addSubscription(loadObservable(page)
-                .retry(2)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<List<T>>() {
-                    @Override
-                    public void call(List<T> lists) {
-                        if (isRefreshFromTop) {
-                            data.clear();
-                            if (isInitLoad) {
-                                if (lists.isEmpty()){
-                                    loadingLayout.showEmpty();
-                                }else {
-                                    loadingLayout.showContent();
-                                }
-                            }else {
-                                mPtrFrame.refreshComplete();
-                            }
+        Subscriber subscriber = new Subscriber<List<T>>() {
+
+            @Override
+            public void onNext(List<T> lists) {
+                if (isRefreshFromTop) {
+                    data.clear();
+                    if (isInitLoad) {
+                        if (lists.isEmpty()){
+                            loadingLayout.showEmpty();
+                        }else {
+                            loadingLayout.showContent();
                         }
-                        if (lists.size() < Config.LIST_COUNT) {
-                            mLoadingFooter.setState(LoadingFooter.State.TheEnd);
-                        } else {
-                            mLoadingFooter.setState(LoadingFooter.State.Idle);
-                        }
-                        mPage = page;
-                        data.addAll(lists);
-                        adapter.notifyDataSetChanged();
+                    }else {
+                        mPtrFrame.refreshComplete();
                     }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        if (isRefreshFromTop) {
-                            if(isInitLoad){
-                                loadingLayout.showError();
-                            }else{
-                                mPtrFrame.refreshComplete();
-                            }
-                        } else {
-                            mLoadingFooter.setState(LoadingFooter.State.Idle);
-                        }
-                        if (!NetUtils.isConnect(getActivity())) {
-                            if(isRefreshFromTop){
-                                if (data.isEmpty()) {
-                                    loadingLayout.showUnnet();
-                                }else {
-                                    Toast.makeText(getActivity(), "网络异常，请稍后重试", Toast.LENGTH_SHORT).show();
-                                }
-                            }else{
-                                mLoadingFooter.setState(LoadingFooter.State.InvalidateNet);
-                            }
-                        }
+                }
+                if (lists.size() < Config.LIST_COUNT) {
+                    mLoadingFooter.setState(LoadingFooter.State.TheEnd);
+                } else {
+                    mLoadingFooter.setState(LoadingFooter.State.Idle);
+                }
+                data.addAll(lists);
+            }
+
+            @Override
+            public void onCompleted() {
+                mPage = page;
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                if (isRefreshFromTop) {
+                    if(isInitLoad){
+                        loadingLayout.showError();
+                    }else{
+                        mPtrFrame.refreshComplete();
                     }
-                })
-        );
+                } else {
+                    mLoadingFooter.setState(LoadingFooter.State.Idle);
+                }
+                if (!NetUtils.isConnect(getActivity())) {
+                    if(isRefreshFromTop){
+                        if (data.isEmpty()) {
+                            loadingLayout.showUnnet();
+                        }else {
+                            Toast.makeText(getActivity(), "网络异常，请稍后重试", Toast.LENGTH_SHORT).show();
+                        }
+                    }else{
+                        mLoadingFooter.setState(LoadingFooter.State.InvalidateNet);
+                    }
+                }
+            }
+        };
+
+        addSubscription(loadObservable(subscriber, page));
     }
 
     @Override
@@ -245,5 +247,5 @@ public abstract class BaseRefreshListFragment<T> extends SwipeRefreshBaseFragmen
 
     protected abstract HeaderBottomItemAdapter<T> getAdapter();
 
-    protected abstract Observable<List<T>> loadObservable(int page);
+    protected abstract Subscription loadObservable(Subscriber<List<T>> subscriber, int page);
 }

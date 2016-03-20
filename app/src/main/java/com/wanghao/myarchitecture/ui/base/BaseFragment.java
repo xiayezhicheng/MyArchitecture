@@ -13,15 +13,6 @@ public class BaseFragment extends Fragment {
     private CompositeSubscription mCompositeSubscription;
 
 
-    public CompositeSubscription getCompositeSubscription() {
-        if (this.mCompositeSubscription == null) {
-            this.mCompositeSubscription = new CompositeSubscription();
-        }
-
-        return this.mCompositeSubscription;
-    }
-
-
     public void addSubscription(Subscription s) {
         if (this.mCompositeSubscription == null) {
             this.mCompositeSubscription = new CompositeSubscription();

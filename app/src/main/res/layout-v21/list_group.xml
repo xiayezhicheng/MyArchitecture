@@ -15,6 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="3dp"
         android:foreground="?attr/selectableItemBackground"
+        android:stateListAnimator="@anim/state_anim_raise"
         android:clickable="true"
         card_view:cardCornerRadius="2dp"
         card_view:cardElevation="4dp">

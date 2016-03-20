@@ -17,10 +17,6 @@ public class MainActivity extends ToolbarActivity {
     @Bind(R.id.viewpager) ViewPager viewPager;
     @Bind(R.id.sliding_tabs) TabLayout tabLayout;
 
-    @Override
-    public int provideContentViewId() {
-        return R.layout.activity_main;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,5 +27,10 @@ public class MainActivity extends ToolbarActivity {
         if (actionBar!=null) actionBar.setTitle("简悦架构");
         viewPager.setAdapter(new SlidingPagerAdapter(getSupportFragmentManager()));
         tabLayout.setupWithViewPager(viewPager);
+    }
+
+    @Override
+    protected int getLayoutResId() {
+        return R.layout.activity_main;
     }
 }

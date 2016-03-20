@@ -17,8 +17,6 @@ import com.wanghao.myarchitecture.R;
  */
 public abstract class ToolbarActivity extends BaseActivity {
 
-    public abstract int provideContentViewId();
-
     public void onToolbarClick() {}
 
     protected Toolbar toolbar;
@@ -28,7 +26,6 @@ public abstract class ToolbarActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(provideContentViewId());
 
         toolbar = (Toolbar)findViewById(R.id.toolbar);
         mAppBar = (AppBarLayout)findViewById(R.id.app_bar_layout);

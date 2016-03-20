@@ -7,12 +7,12 @@ import com.wanghao.myarchitecture.bean.Group;
 import com.wanghao.myarchitecture.enums.TYPE_LAYOUT;
 import com.wanghao.myarchitecture.ui.activity.DetailMsgActivity;
 import com.wanghao.myarchitecture.utils.Config;
-import com.wanghao.myarchitecture.utils.RxUtils;
-import com.wanghao.myarchitecture.vendor.ApiService;
+import com.wanghao.myarchitecture.vendor.ApiUtils;
 
 import java.util.List;
 
-import rx.Observable;
+import rx.Subscriber;
+import rx.Subscription;
 
 public class GroupFragment extends BaseRefreshListFragment<Group> {
 
@@ -32,9 +32,10 @@ public class GroupFragment extends BaseRefreshListFragment<Group> {
         return groupItemAdapter;
     }
 
-    @Override protected Observable<List<Group>> loadObservable(int page) {
-        ApiService service = RxUtils.createApi(ApiService.class, Config.BASE_URL);
-        return service.getGroupList(page, Config.LIST_COUNT);
+    @Override
+    protected Subscription loadObservable(Subscriber<List<Group>> subscriber, int page) {
+
+        return ApiUtils.getInstance().getGroupList(subscriber, page, Config.LIST_COUNT);
     }
 
 

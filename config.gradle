@@ -11,10 +11,10 @@ ext {
     ]
 
     //Libraries
-    androidSupport = "23.1.1"
-    rxJava = '1.0.16'
-    rxAndroid = '1.0.1'
-    retrofit = "2.0.0-beta1"//用2.0.0-beta2显示不出数据，why？
+    androidSupport = "23.2.0"
+    rxJava = '1.1.0'
+    rxAndroid = '1.1.0'
+    retrofit = "2.0.0-beta4"
     uil = "1.9.5"
     butterKnife = '7.0.1'
     ultraPtr = "1.0.11"
@@ -27,9 +27,9 @@ ext {
             supportDesign       : "com.android.support:design:${androidSupport}",
             rxJava              : "io.reactivex:rxjava:${rxJava}",
             rxAndroid           : "io.reactivex:rxandroid:${rxAndroid}",
-            retrofit            : "com.squareup.retrofit:retrofit:${retrofit}",
-            retrofitWithGson    : "com.squareup.retrofit:converter-gson:${retrofit}",
-            retrofitWithRxJava  : "com.squareup.retrofit:adapter-rxjava:${retrofit}",
+            retrofit            : "com.squareup.retrofit2:retrofit:${retrofit}",
+            retrofitWithGson    : "com.squareup.retrofit2:converter-gson:${retrofit}",
+            retrofitWithRxJava  : "com.squareup.retrofit2:adapter-rxjava:${retrofit}",
             uil                 : "com.nostra13.universalimageloader:universal-image-loader:${uil}",
             butterKnife         : "com.jakewharton:butterknife:${butterKnife}",
             ultraPtr            : "in.srain.cube:ultra-ptr:${ultraPtr}"
