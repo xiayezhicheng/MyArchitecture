@@ -105,6 +105,8 @@ dependencies {
 
     //Dependencies
     def libs = rootProject.ext.libs
+    def debuglibs = rootProject.ext.debuglibs
+    def releaselibs = rootProject.ext.releaselibs
 
     compile libs.cardView
     compile libs.appcompat
@@ -119,7 +121,8 @@ dependencies {
     compile libs.uil
     compile libs.butterKnife
     compile libs.ultraPtr
-
+    debugCompile debuglibs.leakCanary
+    releaseCompile releaselibs.leakCanary
 
 
 }

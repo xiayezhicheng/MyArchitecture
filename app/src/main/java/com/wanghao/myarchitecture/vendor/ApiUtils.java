@@ -41,10 +41,10 @@ public class ApiUtils {
 
     public ApiUtils(){
 
-        OkHttpClient.Builder builder = OkHttpClientUtil.get();
+        OkHttpClient client = OkHttpClientUtil.getClient();
 
         Retrofit retrofit = new Retrofit.Builder()
-                .client(builder.build())
+                .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .baseUrl(Config.BASE_URL)

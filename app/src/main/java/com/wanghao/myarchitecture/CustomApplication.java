@@ -9,6 +9,8 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
+import com.squareup.leakcanary.LeakCanary;
+import com.squareup.leakcanary.RefWatcher;
 import com.wanghao.myarchitecture.utils.SharedPreferencesUtils;
 
 /**
@@ -16,12 +18,17 @@ import com.wanghao.myarchitecture.utils.SharedPreferencesUtils;
  */
 public class CustomApplication extends Application {
 
+    private RefWatcher mRefWatcher;
+
     public static CustomApplication mInstance;
     private static Context context;
 
     @Override
     public void onCreate() {
         super.onCreate();
+
+        //LeakCanary
+        mRefWatcher = LeakCanary.install(this);
 
         mInstance = this;
         context = getApplicationContext();

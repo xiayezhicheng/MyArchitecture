@@ -48,7 +48,7 @@ public class DetailMsgActivity extends ToolbarActivity {
 
     private void init() {
         // 如果想使用 CollapsingToolbarLayout和Toolbar，那么设置标题就使用CollapsingToolbarLayout的setTitle()
-        //为可折叠toolbar设置标题
+        // 为可折叠toolbar设置标题
         mCollapsingToolbarLayout.setTitle("房屋详情");
 
         mNestedScrollView.setOverScrollMode(View.OVER_SCROLL_NEVER);
