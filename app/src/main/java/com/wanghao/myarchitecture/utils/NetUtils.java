@@ -28,7 +28,7 @@ public class NetUtils {
         WIFI,
         MOBILE_GPRS,
         MOBILE_EDGE,
-        MOBILE_3G;
+        MOBILE_3G
     }
 
     public static <Params, Progress, Result> void executeAsyncTask(

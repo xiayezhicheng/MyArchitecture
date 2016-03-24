@@ -1,18 +1,20 @@
 package com.wanghao.myarchitecture.ui.activity;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.widget.NestedScrollView;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.wanghao.myarchitecture.R;
 import com.wanghao.myarchitecture.ui.base.ToolbarActivity;
-import com.wanghao.myarchitecture.utils.Config;
+import com.wanghao.myarchitecture.Config;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -27,6 +29,7 @@ public class DetailMsgActivity extends ToolbarActivity {
     @Bind(R.id.collapsingToolbarLayout) CollapsingToolbarLayout
             mCollapsingToolbarLayout;
     @Bind(R.id.nested_view) NestedScrollView mNestedScrollView;
+    @Bind(R.id.fragment_webview) WebView fragment_webview;
 
 
     @Override
@@ -59,11 +62,17 @@ public class DetailMsgActivity extends ToolbarActivity {
     }
 
     private void loadData() {
-        String title = getIntent().getStringExtra(Config.Key_House_Title);
-        String imgUrl = getIntent().getStringExtra(Config.Key_House_Img);
+        Intent intent = getIntent();
+        String title = intent.getStringExtra(Config.Key_House_Title);
+        String imgUrl = intent.getStringExtra(Config.Key_House_Img);
         mTvSource.setText(title);
         ImageLoader.getInstance().displayImage(imgUrl,mIvHeader);
     }
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        fragment_webview.removeAllViews();
+        fragment_webview.destroy();
+    }
 }

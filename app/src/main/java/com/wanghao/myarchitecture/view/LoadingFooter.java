@@ -24,7 +24,7 @@ public class LoadingFooter {
 
     private AnimationDrawable animationDrawable;
 
-    public static enum State {
+    public enum State {
         Idle, TheEnd, Loading, InvalidateNet
     }
 
@@ -114,6 +114,6 @@ public class LoadingFooter {
      * @since 2014-11-25 下午4:49:58
      */
     public interface onClickLoadListener{
-        public void onClick();
+        void onClick();
     }
 }

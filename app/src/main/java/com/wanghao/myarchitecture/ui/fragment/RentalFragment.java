@@ -1,15 +1,21 @@
 package com.wanghao.myarchitecture.ui.fragment;
 
 import android.content.Intent;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 
+import com.wanghao.myarchitecture.Config;
 import com.wanghao.myarchitecture.adapter.RentalItemAdapter;
 import com.wanghao.myarchitecture.bean.Rental;
+import com.wanghao.myarchitecture.di.component.DaggerFragmentComponent;
+import com.wanghao.myarchitecture.di.module.ApiModule;
 import com.wanghao.myarchitecture.enums.TYPE_LAYOUT;
 import com.wanghao.myarchitecture.ui.activity.DetailMsgActivity;
-import com.wanghao.myarchitecture.utils.Config;
-import com.wanghao.myarchitecture.vendor.ApiUtils;
+import com.wanghao.myarchitecture.vendor.Api;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 import rx.Subscriber;
 import rx.Subscription;
@@ -19,10 +25,22 @@ import rx.Subscription;
  */
 public class RentalFragment extends BaseRefreshListFragment<Rental>{
 
+    @Inject
+    Api api;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        DaggerFragmentComponent
+                .builder()
+                .apiModule(new ApiModule())
+                .build().inject(this);
+    }
+
     @Override
     protected RentalItemAdapter getAdapter() {
         RentalItemAdapter rentalItemAdapter = new RentalItemAdapter(getActivity(), data);
-        rentalItemAdapter.setOnItemClickListener(new RentalItemAdapter.OnItemClick() {
+        RentalItemAdapter.setOnItemClickListener(new RentalItemAdapter.OnItemClick() {
             @Override
             public void onClick(int position) {
                 Intent intent = new Intent(getActivity(), DetailMsgActivity.class);
@@ -38,7 +56,7 @@ public class RentalFragment extends BaseRefreshListFragment<Rental>{
 
     @Override protected Subscription loadObservable(Subscriber<List<Rental>> subscriber, int page) {
 
-        return ApiUtils.getInstance().getRentalList(subscriber, page, Config.LIST_COUNT);
+        return api.getRentalList(subscriber, page, Config.LIST_COUNT);
     }
 
     @Override

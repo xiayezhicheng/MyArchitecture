@@ -12,11 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.wanghao.myarchitecture.Config;
 import com.wanghao.myarchitecture.R;
 import com.wanghao.myarchitecture.adapter.HeaderBottomItemAdapter;
 import com.wanghao.myarchitecture.enums.TYPE_LAYOUT;
 import com.wanghao.myarchitecture.ui.base.SwipeRefreshBaseFragment;
-import com.wanghao.myarchitecture.utils.Config;
 import com.wanghao.myarchitecture.utils.NetUtils;
 import com.wanghao.myarchitecture.view.LoadingFooter;
 import com.wanghao.myarchitecture.view.LoadingLayout;

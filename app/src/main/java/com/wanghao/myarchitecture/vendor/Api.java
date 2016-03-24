@@ -1,46 +1,32 @@
 package com.wanghao.myarchitecture.vendor;
 
+import com.wanghao.myarchitecture.Config;
 import com.wanghao.myarchitecture.bean.Group;
 import com.wanghao.myarchitecture.bean.Rental;
-import com.wanghao.myarchitecture.utils.Config;
+import com.wanghao.myarchitecture.service.ApiService;
 import com.wanghao.myarchitecture.utils.OkHttpClientUtil;
 import com.wanghao.myarchitecture.utils.SchedulersUtils;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.GET;
-import retrofit2.http.Query;
-import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
 
 /**
- * Created by wanghao on 2016/3/18.
+ * Created by wanghao on 2016/3/23.
  */
-public class ApiUtils {
-    private Retrofit retrofit;
+public class Api {
 
-    public static ApiUtils instance;
+    ApiService mApiService;
 
-    public static ApiUtils getInstance(){
-        if (null==instance){
-            synchronized (ApiUtils.class){
-                if (null==instance){
-                    instance = new ApiUtils();
-                }
-            }
-        }
-        return instance;
-    }
-
-    private final ApiService mApiService;
-
-    public ApiUtils(){
-
+    @Inject
+    public Api(){
         OkHttpClient client = OkHttpClientUtil.getClient();
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -50,16 +36,6 @@ public class ApiUtils {
                 .baseUrl(Config.BASE_URL)
                 .build();
         mApiService = retrofit.create(ApiService.class);
-    }
-
-    public interface ApiService {
-
-        @GET(Config.GROUP)
-        Observable<List<Group>> getGroupList(@Query("page")int page, @Query("count")int count);
-
-        @GET(Config.RENTAL)
-        Observable<List<Rental>> getRentalList(@Query("page")int page, @Query("count")int count);
-
     }
 
     /**

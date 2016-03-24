@@ -1,5 +1,7 @@
 package com.wanghao.myarchitecture.utils;
 
+import com.wanghao.myarchitecture.Config;
+
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 

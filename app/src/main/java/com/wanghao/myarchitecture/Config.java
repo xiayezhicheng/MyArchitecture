@@ -1,4 +1,4 @@
-package com.wanghao.myarchitecture.utils;
+package com.wanghao.myarchitecture;
 
 /**
  * Created by wanghao on 2015/12/12.

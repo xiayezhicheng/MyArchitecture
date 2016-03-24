@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt' // 注释处理
 
 def releaseTime(){
     return new Date().format("yyyy-MM-dd",TimeZone.getTimeZone("UTC"))
@@ -121,8 +122,11 @@ dependencies {
     compile libs.uil
     compile libs.butterKnife
     compile libs.ultraPtr
+    compile libs.dagger
+    provided libs.daggerCompiler
+
     debugCompile debuglibs.leakCanary
     releaseCompile releaselibs.leakCanary
 
-
+    provided libs.jsr250
 }

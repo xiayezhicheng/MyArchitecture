@@ -20,9 +20,6 @@ public class CustomApplication extends Application {
 
     private RefWatcher mRefWatcher;
 
-    public static CustomApplication mInstance;
-    private static Context context;
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -30,17 +27,15 @@ public class CustomApplication extends Application {
         //LeakCanary
         mRefWatcher = LeakCanary.install(this);
 
-        mInstance = this;
-        context = getApplicationContext();
-
         //初始化SharedPreferences
-        SharedPreferencesUtils.getInstance().Builder(context);
+        SharedPreferencesUtils.getInstance().Builder(this);
         // Occasional EOFException when reading cached file
         // 1. Try to load lots of previously cached images in a ListView by
         // quickly scrolling back and forth
         // 2. Some images will fail to load
         System.setProperty("http.keepAlive", "false");
-        initImageLoader(context);
+        initImageLoader(this);
+
     }
 
     /**
@@ -72,25 +67,4 @@ public class CustomApplication extends Application {
 
     }
 
-    /**
-     * Application单例
-     * @author wanghao
-     * @since 2015-1-27 上午11:06:15
-     * @return
-     * @return CustomApplication
-     */
-    public static CustomApplication getInstance() {
-        return mInstance;
-    }
-
-    /**
-     * 应用的上下文
-     * @author wanghao
-     * @since 2015-1-27 下午4:11:08
-     * @return
-     * @return Context
-     */
-    public static Context getContext() {
-        return context;
-    }
 }
