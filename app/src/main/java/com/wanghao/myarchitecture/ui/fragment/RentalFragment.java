@@ -1,17 +1,16 @@
 package com.wanghao.myarchitecture.ui.fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
-import com.wanghao.myarchitecture.Config;
-import com.wanghao.myarchitecture.adapter.RentalItemAdapter;
-import com.wanghao.myarchitecture.bean.Rental;
 import com.wanghao.myarchitecture.di.component.DaggerFragmentComponent;
-import com.wanghao.myarchitecture.di.module.ApiModule;
+import com.wanghao.myarchitecture.di.module.GroupModule;
+import com.wanghao.myarchitecture.di.module.RentalModule;
+import com.wanghao.myarchitecture.domain.entity.Rental;
 import com.wanghao.myarchitecture.enums.TYPE_LAYOUT;
-import com.wanghao.myarchitecture.ui.activity.DetailMsgActivity;
-import com.wanghao.myarchitecture.vendor.Api;
+import com.wanghao.myarchitecture.ui.adapter.RentalItemAdapter;
+import com.wanghao.myarchitecture.ui.viewmodel.ItemRentalViewModel;
+import com.wanghao.myarchitecture.vendor.Config;
 
 import java.util.List;
 
@@ -26,37 +25,28 @@ import rx.Subscription;
 public class RentalFragment extends BaseRefreshListFragment<Rental>{
 
     @Inject
-    Api api;
+    ItemRentalViewModel itemRentalViewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         DaggerFragmentComponent
                 .builder()
-                .apiModule(new ApiModule())
+                .groupModule(new GroupModule(getActivity()))
+                .rentalModule(new RentalModule(getActivity()))
                 .build().inject(this);
     }
 
     @Override
     protected RentalItemAdapter getAdapter() {
-        RentalItemAdapter rentalItemAdapter = new RentalItemAdapter(getActivity(), data);
-        RentalItemAdapter.setOnItemClickListener(new RentalItemAdapter.OnItemClick() {
-            @Override
-            public void onClick(int position) {
-                Intent intent = new Intent(getActivity(), DetailMsgActivity.class);
-                Rental clickRental = data.get(position);
-                intent.putExtra(Config.Key_House_Title,clickRental.getTitle());
-                intent.putExtra(Config.Key_House_Img,clickRental.getThumb());
-                startActivity(intent);
-            }
-        });
-        return rentalItemAdapter;
+        itemRentalViewModel.setData(data);
+        return itemRentalViewModel.getAdapter();
     }
 
 
     @Override protected Subscription loadObservable(Subscriber<List<Rental>> subscriber, int page) {
 
-        return api.getRentalList(subscriber, page, Config.LIST_COUNT);
+        return itemRentalViewModel.getRentalList(subscriber, page, Config.LIST_COUNT);
     }
 
     @Override

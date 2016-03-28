@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
         <variable
-            name="rental"
-            type="com.wanghao.myarchitecture.bean.Rental"/>
+            name="viewModel"
+            type="com.wanghao.myarchitecture.ui.viewmodel.ItemRentalViewModel"/>
     </data>
 
     <android.support.v7.widget.CardView
@@ -14,18 +14,21 @@
         android:layout_height="wrap_content"
         android:layout_margin="3dp"
         android:foreground="?attr/selectableItemBackground"
+        android:stateListAnimator="@anim/state_anim_raise"
         android:clickable="true"
-        card_view:cardCornerRadius="2dp"
-        card_view:cardElevation="4dp">
+        app:cardCornerRadius="2dp"
+        app:cardElevation="4dp">
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:onClick="@{viewModel.onItemClick}">
 
             <ImageView
                 android:id="@+id/img_rental"
                 android:layout_width="66dp"
                 android:layout_height="50dp"
-                android:scaleType="centerCrop" />
+                android:scaleType="centerCrop"
+                app:imageUrl="@{viewModel.getThumb()}"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -42,7 +45,7 @@
                     android:ellipsize="end"
                     android:lineSpacingMultiplier="1.2"
                     android:maxLines="2"
-                    android:text="@{rental.title}"
+                    android:text="@{viewModel.title}"
                     android:textSize="11sp"/>
 
                 <TextView
@@ -54,7 +57,7 @@
                     android:layout_marginTop="2dp"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="@{rental.address}"
+                    android:text="@{viewModel.address}"
                     android:textSize="10sp" />
 
                 <TextView
@@ -64,7 +67,7 @@
                     android:layout_below="@+id/txt_content_rental"
                     android:layout_alignLeft="@+id/txt_title_rental"
                     android:layout_marginTop="2dp"
-                    android:text="@{@string/rental_type(rental.room,rental.hall,rental.toilet)}"
+                    android:text="@{@string/rental_type(viewModel.room,viewModel.hall,viewModel.toilet)}"
                     android:textSize="9sp" />
 
                 <TextView
@@ -74,7 +77,7 @@
                     android:layout_toRightOf="@id/txt_type_rental"
                     android:layout_alignBaseline="@id/txt_type_rental"
                     android:layout_marginLeft="3dp"
-                    android:text="@{@string/rental_area(rental.houseearm)}"
+                    android:text="@{@string/rental_area(viewModel.houseearm)}"
                     android:textSize="9sp" />
 
                 <TextView
@@ -83,7 +86,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/txt_type_rental"
                     android:layout_alignLeft="@+id/txt_type_rental"
-                    android:text="@{@string/rental_price(rental.price)}"
+                    android:text="@{@string/rental_price(viewModel.price)}"
                     android:textColor="#ff0000"
                     android:textSize="11sp"/>
             </RelativeLayout>

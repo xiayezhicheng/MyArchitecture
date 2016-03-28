@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <com.wanghao.myarchitecture.view.LoadingLayout
+    <com.wanghao.myarchitecture.ui.widget.LoadingLayout
         android:id="@+id/loading_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -30,5 +30,5 @@
                 android:scrollbarStyle="outsideOverlay"/>
 
         </in.srain.cube.views.ptr.PtrClassicFrameLayout>
-    </com.wanghao.myarchitecture.view.LoadingLayout>
+    </com.wanghao.myarchitecture.ui.widget.LoadingLayout>
 </RelativeLayout>

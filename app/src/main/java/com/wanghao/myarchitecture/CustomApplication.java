@@ -13,6 +13,8 @@ import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
 import com.wanghao.myarchitecture.utils.SharedPreferencesUtils;
 
+import me.drakeet.library.CrashWoodpecker;
+
 /**
  * Created by wanghao on 2015/9/23.
  */
@@ -26,7 +28,8 @@ public class CustomApplication extends Application {
 
         //LeakCanary
         mRefWatcher = LeakCanary.install(this);
-
+        //CrashWoodpecker
+        CrashWoodpecker.init(this);
         //初始化SharedPreferences
         SharedPreferencesUtils.getInstance().Builder(this);
         // Occasional EOFException when reading cached file

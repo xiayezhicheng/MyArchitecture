@@ -18,7 +18,8 @@ ext {
     uil = "1.9.5"
     butterKnife = '7.0.1'
     ultraPtr = "1.0.11"
-    leakCanaryVersion = "1.3.1"
+    leakCanary = "1.3.1"
+    crashwoodpecker = "0.9.83"
     dagger = "2.0.2"
     jsr250 = "1.0"
 
@@ -42,10 +43,12 @@ ext {
     ]
 
     debuglibs = [
-            leakCanary          : "com.squareup.leakcanary:leakcanary-android:${leakCanaryVersion}"
+            leakCanary          : "com.squareup.leakcanary:leakcanary-android:${leakCanary}",
+            crashwoodpecker     : "me.drakeet.library:crashwoodpecker:${crashwoodpecker}"
     ]
 
     releaselibs = [
-            leakCanary          : "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
+            leakCanary          : "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanary}",
+            crashwoodpecker     : "me.drakeet.library:crashwoodpecker-do-nothing:${crashwoodpecker}"
     ]
 }

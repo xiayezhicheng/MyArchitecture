@@ -1,13 +1,13 @@
 package com.wanghao.myarchitecture.ui.activity;
 
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 
 import com.wanghao.myarchitecture.R;
-import com.wanghao.myarchitecture.adapter.SlidingPagerAdapter;
-import com.wanghao.myarchitecture.ui.base.ToolbarActivity;
+import com.wanghao.myarchitecture.ui.adapter.SlidingPagerAdapter;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -16,7 +16,6 @@ public class MainActivity extends ToolbarActivity {
 
     @Bind(R.id.viewpager) ViewPager viewPager;
     @Bind(R.id.sliding_tabs) TabLayout tabLayout;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +29,7 @@ public class MainActivity extends ToolbarActivity {
     }
 
     @Override
-    protected int getLayoutResId() {
-        return R.layout.activity_main;
+    public void onCreateBinding() {
+        DataBindingUtil.setContentView(this,R.layout.activity_main);
     }
 }

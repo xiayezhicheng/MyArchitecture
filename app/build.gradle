@@ -71,6 +71,12 @@ android {
         }
     }
 
+    // 注释冲突
+    packagingOptions {
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
+    }
+
+
     // 友盟多渠道打包
     productFlavors {
         wandoujia {}
@@ -123,10 +129,12 @@ dependencies {
     compile libs.butterKnife
     compile libs.ultraPtr
     compile libs.dagger
-    provided libs.daggerCompiler
 
     debugCompile debuglibs.leakCanary
     releaseCompile releaselibs.leakCanary
+    debugCompile debuglibs.crashwoodpecker
+    releaseCompile releaselibs.crashwoodpecker
 
+    provided libs.daggerCompiler
     provided libs.jsr250
 }

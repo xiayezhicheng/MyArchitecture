@@ -1,6 +1,8 @@
 package com.wanghao.myarchitecture.ui.activity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,13 +10,11 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.widget.NestedScrollView;
 import android.view.View;
 import android.webkit.WebView;
-import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
 import com.wanghao.myarchitecture.R;
-import com.wanghao.myarchitecture.ui.base.ToolbarActivity;
-import com.wanghao.myarchitecture.Config;
+import com.wanghao.myarchitecture.databinding.ActivityDetailMsgBinding;
+import com.wanghao.myarchitecture.ui.viewmodel.DetailMsgViewModel;
+import com.wanghao.myarchitecture.vendor.Config;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -24,29 +24,37 @@ import butterknife.ButterKnife;
  */
 public class DetailMsgActivity extends ToolbarActivity {
 
-    @Bind(R.id.iv_header) ImageView mIvHeader;
-    @Bind(R.id.tv_source) TextView mTvSource;
     @Bind(R.id.collapsingToolbarLayout) CollapsingToolbarLayout
             mCollapsingToolbarLayout;
     @Bind(R.id.nested_view) NestedScrollView mNestedScrollView;
     @Bind(R.id.fragment_webview) WebView fragment_webview;
 
+    private ActivityDetailMsgBinding binding;
+    private DetailMsgViewModel viewModel;
+
+    public static Intent newIntent(Context context, String title, String thumb) {
+        Intent intent = new Intent(context, DetailMsgActivity.class);
+        intent.putExtra(Config.Key_House_Title, title);
+        intent.putExtra(Config.Key_House_Img, thumb);
+        return intent;
+    }
+
+    @Override
+    public void onCreateBinding() {
+        binding = DataBindingUtil.setContentView(this,R.layout.activity_detail_msg);
+    }
 
     @Override
     public boolean canBack() {
         return true;
     }
 
-    @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        loadData();
         ButterKnife.bind(this);
         init();
-        loadData();
-    }
-
-    @Override
-    protected int getLayoutResId() {
-        return R.layout.activity_detail_msg;
     }
 
     private void init() {
@@ -65,13 +73,15 @@ public class DetailMsgActivity extends ToolbarActivity {
         Intent intent = getIntent();
         String title = intent.getStringExtra(Config.Key_House_Title);
         String imgUrl = intent.getStringExtra(Config.Key_House_Img);
-        mTvSource.setText(title);
-        ImageLoader.getInstance().displayImage(imgUrl,mIvHeader);
+
+        viewModel = new DetailMsgViewModel(title,imgUrl);
+        binding.setViewModel(viewModel);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        viewModel.destroy();
         fragment_webview.removeAllViews();
         fragment_webview.destroy();
     }
