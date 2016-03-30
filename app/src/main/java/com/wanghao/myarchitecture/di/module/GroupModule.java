@@ -2,8 +2,7 @@ package com.wanghao.myarchitecture.di.module;
 
 import android.content.Context;
 
-import com.wanghao.myarchitecture.domain.entity.Group;
-import com.wanghao.myarchitecture.ui.viewmodel.ItemGroupViewModel;
+import com.wanghao.myarchitecture.ui.viewmodel.GroupViewModel;
 
 import javax.inject.Singleton;
 
@@ -25,8 +24,8 @@ public class GroupModule {
 
     @Singleton
     @Provides
-    protected ItemGroupViewModel provideGroupViewModel(){
-        return new ItemGroupViewModel(context,new Group());
+    protected GroupViewModel provideGroupViewModel(){
+        return new GroupViewModel(context);
     }
 
     @Singleton

@@ -2,8 +2,7 @@ package com.wanghao.myarchitecture.di.module;
 
 import android.content.Context;
 
-import com.wanghao.myarchitecture.domain.entity.Rental;
-import com.wanghao.myarchitecture.ui.viewmodel.ItemRentalViewModel;
+import com.wanghao.myarchitecture.ui.viewmodel.RentalViewModel;
 
 import javax.inject.Singleton;
 
@@ -25,8 +24,8 @@ public class RentalModule {
 
     @Singleton
     @Provides
-    protected ItemRentalViewModel provideRentalViewModel(){
-        return new ItemRentalViewModel(context,new Rental());
+    protected RentalViewModel provideRentalViewModel(){
+        return new RentalViewModel(context);
     }
 
     @Singleton

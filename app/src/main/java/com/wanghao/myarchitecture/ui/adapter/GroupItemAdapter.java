@@ -7,9 +7,8 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import com.wanghao.myarchitecture.R;
-import com.wanghao.myarchitecture.databinding.ListGroupBinding;
+import com.wanghao.myarchitecture.databinding.ItemGroupBinding;
 import com.wanghao.myarchitecture.domain.entity.Group;
-import com.wanghao.myarchitecture.ui.viewmodel.ItemGroupViewModel;
 
 import java.util.List;
 
@@ -25,33 +24,25 @@ public class GroupItemAdapter extends HeaderBottomItemAdapter<Group> {
 
     @Override
     public void bindContentViewHolder(RecyclerView.ViewHolder holder,final int position) {
-        ((ContentViewHolder)holder).bindGroup(getList().get(position));
+        ((ContentViewHolder)holder).binding.setVariable(com.wanghao.myarchitecture.BR.group,getList().get(position));
+        ((ContentViewHolder)holder).binding.executePendingBindings();
     }
 
     @Override
     protected RecyclerView.ViewHolder onCreateContentView(ViewGroup parent) {
-        ListGroupBinding binding = DataBindingUtil
-                .inflate(LayoutInflater.from(parent.getContext()), R.layout.list_group,parent,false);
+        ItemGroupBinding binding = DataBindingUtil
+                .inflate(LayoutInflater.from(parent.getContext()), R.layout.item_group,parent,false);
         return new ContentViewHolder(binding);
     }
 
     public static class ContentViewHolder extends RecyclerView.ViewHolder{
 
-        ListGroupBinding binding;
-        ItemGroupViewModel viewModel;
+        ItemGroupBinding binding;
 
-        public ContentViewHolder(ListGroupBinding binding) {
+        public ContentViewHolder(ItemGroupBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }
-
-        void bindGroup(Group group) {
-            viewModel = binding.getViewModel();
-            if (viewModel == null) {
-                binding.setViewModel(new ItemGroupViewModel(itemView.getContext(), group));
-            } else {
-                viewModel.setGroup(group);
-            }
-        }
     }
+
 }

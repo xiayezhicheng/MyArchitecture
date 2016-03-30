@@ -107,4 +107,8 @@ public abstract class HeaderBottomItemAdapter<E> extends BaseMultipleItemAdapter
         view.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT));
         this.view = view;
     }
+
+    public View getBottomView(){
+        return this.view;
+    }
 }

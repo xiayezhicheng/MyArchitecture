@@ -5,91 +5,39 @@
     <data>
         <variable
             name="viewModel"
-            type="com.wanghao.myarchitecture.ui.viewmodel.ItemRentalViewModel"/>
+            type="com.wanghao.myarchitecture.ui.viewmodel.RentalViewModel"/>
     </data>
-
-    <android.support.v7.widget.CardView
-        android:id="@+id/card_view"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="3dp"
-        android:foreground="?attr/selectableItemBackground"
-        android:stateListAnimator="@anim/state_anim_raise"
-        android:clickable="true"
-        app:cardCornerRadius="2dp"
-        app:cardElevation="4dp">
-        <RelativeLayout
+        android:layout_height="match_parent">
+        <com.wanghao.myarchitecture.ui.widget.LoadingLayout
+            android:id="@+id/loading_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="@{viewModel.onItemClick}">
-
-            <ImageView
-                android:id="@+id/img_rental"
-                android:layout_width="66dp"
-                android:layout_height="50dp"
-                android:scaleType="centerCrop"
-                app:imageUrl="@{viewModel.getThumb()}"/>
-
-            <RelativeLayout
+            android:layout_height="match_parent">
+            <in.srain.cube.views.ptr.PtrClassicFrameLayout
+                android:id="@+id/rotate_header_list_view_frame"
+                app:ptr_content="@+id/with_long_press_list_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
-                android:layout_toRightOf="@id/img_rental">
+                android:layout_height="match_parent"
+                app:ptr_duration_to_close="200"
+                app:ptr_duration_to_close_header="1000"
+                app:ptr_keep_header_when_refresh="true"
+                app:ptr_pull_to_fresh="false"
+                app:ptr_ratio_of_header_height_to_refresh="1.2"
+                app:ptr_resistance="1.7">
 
-                <TextView
-                    android:id="@+id/txt_title_rental"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:ellipsize="end"
-                    android:lineSpacingMultiplier="1.2"
-                    android:maxLines="2"
-                    android:text="@{viewModel.title}"
-                    android:textSize="11sp"/>
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp"
+                    android:scrollbarStyle="outsideOverlay"
+                    app:adapter="@{viewModel.getAdapter()}"
+                    app:loadingFooter="@{viewModel.getLoadingFooter()}"
+                    app:layoutType="@{viewModel.getLayoutType()}"/>
 
-                <TextView
-                    android:id="@+id/txt_content_rental"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/txt_title_rental"
-                    android:layout_alignLeft="@+id/txt_title_rental"
-                    android:layout_marginTop="2dp"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:text="@{viewModel.address}"
-                    android:textSize="10sp" />
-
-                <TextView
-                    android:id="@+id/txt_type_rental"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/txt_content_rental"
-                    android:layout_alignLeft="@+id/txt_title_rental"
-                    android:layout_marginTop="2dp"
-                    android:text="@{@string/rental_type(viewModel.room,viewModel.hall,viewModel.toilet)}"
-                    android:textSize="9sp" />
-
-                <TextView
-                    android:id="@+id/txt_area_rental"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/txt_type_rental"
-                    android:layout_alignBaseline="@id/txt_type_rental"
-                    android:layout_marginLeft="3dp"
-                    android:text="@{@string/rental_area(viewModel.houseearm)}"
-                    android:textSize="9sp" />
-
-                <TextView
-                    android:id="@+id/txt_rental_price"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/txt_type_rental"
-                    android:layout_alignLeft="@+id/txt_type_rental"
-                    android:text="@{@string/rental_price(viewModel.price)}"
-                    android:textColor="#ff0000"
-                    android:textSize="11sp"/>
-            </RelativeLayout>
-        </RelativeLayout>
-    </android.support.v7.widget.CardView>
+            </in.srain.cube.views.ptr.PtrClassicFrameLayout>
+        </com.wanghao.myarchitecture.ui.widget.LoadingLayout>
+    </RelativeLayout>
 </layout>

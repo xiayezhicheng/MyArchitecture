@@ -1,8 +1,11 @@
 package com.wanghao.myarchitecture.domain.entity;
 
+import android.content.Intent;
 import android.databinding.Bindable;
+import android.view.View;
 
 import com.wanghao.myarchitecture.BR;
+import com.wanghao.myarchitecture.ui.activity.DetailMsgActivity;
 
 /**
  * Created by wanghao on 2016/3/24.
@@ -120,5 +123,4 @@ public class Group extends BaseEntity {
         this.alarm_id = alarm_id;
         notifyPropertyChanged(BR.alarm_id);
     }
-
 }

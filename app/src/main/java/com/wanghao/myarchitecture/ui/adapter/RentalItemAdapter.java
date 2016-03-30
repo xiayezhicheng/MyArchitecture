@@ -7,9 +7,8 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import com.wanghao.myarchitecture.R;
-import com.wanghao.myarchitecture.databinding.ListRentalBinding;
+import com.wanghao.myarchitecture.databinding.ItemRentalBinding;
 import com.wanghao.myarchitecture.domain.entity.Rental;
-import com.wanghao.myarchitecture.ui.viewmodel.ItemRentalViewModel;
 
 import java.util.List;
 
@@ -24,33 +23,25 @@ public class RentalItemAdapter extends HeaderBottomItemAdapter<Rental>  {
 
     @Override
     public void bindContentViewHolder(RecyclerView.ViewHolder holder,final int position) {
-        ((ContentViewHolder)holder).bindRental(getList().get(position));
+        ((ContentViewHolder)holder).binding.setVariable(com.wanghao.myarchitecture.BR.rental,getList().get(position));
+        ((ContentViewHolder)holder).binding.executePendingBindings();
     }
 
     @Override
     protected RecyclerView.ViewHolder onCreateContentView(ViewGroup parent) {
-        ListRentalBinding binding = DataBindingUtil
-                .inflate(LayoutInflater.from(parent.getContext()), R.layout.list_rental,parent,false);
+        ItemRentalBinding binding = DataBindingUtil
+                .inflate(LayoutInflater.from(parent.getContext()), R.layout.item_rental,parent,false);
         return new ContentViewHolder(binding);
     }
 
     public static class ContentViewHolder extends RecyclerView.ViewHolder{
 
-        ListRentalBinding binding;
-        ItemRentalViewModel viewModel;
+        ItemRentalBinding binding;
 
-        public ContentViewHolder(ListRentalBinding binding) {
+        public ContentViewHolder(ItemRentalBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }
-
-        void bindRental(Rental rental) {
-            viewModel = binding.getViewModel();
-            if (viewModel == null) {
-                binding.setViewModel(new ItemRentalViewModel(itemView.getContext(), rental));
-            } else {
-                viewModel.setRental(rental);
-            }
-        }
     }
+
 }

@@ -3,14 +3,15 @@ package com.wanghao.myarchitecture.ui.viewmodel;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.BaseObservable;
-import android.view.View;
 
 import com.wanghao.myarchitecture.domain.RetrofitClient;
 import com.wanghao.myarchitecture.domain.SchedulersUtils;
 import com.wanghao.myarchitecture.domain.entity.Group;
 import com.wanghao.myarchitecture.domain.service.HouseService;
+import com.wanghao.myarchitecture.enums.TYPE_LAYOUT;
 import com.wanghao.myarchitecture.ui.activity.DetailMsgActivity;
 import com.wanghao.myarchitecture.ui.adapter.GroupItemAdapter;
+import com.wanghao.myarchitecture.ui.widget.LoadingFooter;
 
 import java.util.List;
 
@@ -20,57 +21,43 @@ import rx.Subscriber;
 import rx.Subscription;
 
 /**
- * Created by wanghao on 2016/3/27.
+ * Created by wanghao on 2016/3/30.
  */
-public class ItemGroupViewModel extends BaseObservable implements ViewModel{
+public class GroupViewModel extends BaseObservable implements ViewModel {
 
-    private Group group;
     private Context context;
+    private HouseService mHouseService;
     private List<Group> data;
     private GroupItemAdapter adapter;
-    private HouseService mHouseService;
+    private LoadingFooter loadingFooter;
 
     @Inject
-    public ItemGroupViewModel(Context context, Group group) {
+    public GroupViewModel(Context context) {
         this.context = context;
-        this.group = group;
         mHouseService = RetrofitClient.getInstance().create(HouseService.class);
-    }
-
-    public void onItemClick(View view){
-        Intent intent = DetailMsgActivity.newIntent(context,group.getTitle(),group.getThumb());
-        context.startActivity(intent);
-    }
-
-    public void setGroup(Group group){
-        this.group = group;
-        notifyChange();
+        loadingFooter = new LoadingFooter(context);
     }
 
     public GroupItemAdapter getAdapter(){
-        adapter = new GroupItemAdapter(context,data);
+        if (adapter==null){
+            adapter = new GroupItemAdapter(context,data);
+        }
         return adapter;
     }
 
-    public void setData(List<Group> data){
-        this.data = data;
+    public TYPE_LAYOUT getLayoutType(){
+        return TYPE_LAYOUT.TYPE_LINEAR_LAYOUT;
     }
 
-    public String getPrice() {
-        return group.getPrice();
+    public LoadingFooter getLoadingFooter(){ return loadingFooter;}
+
+    public void setData(List<Group> data){
+        this.data = data;
+        if (adapter==null){
+            adapter = new GroupItemAdapter(context,data);
+        }
     }
-    public String getThumb() {
-        return group.getThumb();
-    }
-    public String getTitle() {
-        return group.getTitle();
-    }
-    public String getAddress() {
-        return group.getAddress();
-    }
-    public String getOrders() {
-        return group.getOrders();
-    }
+
 
     /**
      * 用于获取团购房的数据
