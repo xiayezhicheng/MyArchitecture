@@ -1,15 +1,18 @@
-package com.wanghao.myarchitecture;
+package com.dlut.wanghao.myarchitecture;
 
 import android.app.Application;
 import android.content.Context;
 
+import com.dlut.wanghao.myarchitecture.utils.SharedPreferencesUtils;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
-import com.wanghao.myarchitecture.utils.SharedPreferencesUtils;
+
+import me.drakeet.library.CrashWoodpecker;
+
 
 /**
  * Created by wanghao on 2015/9/23.
@@ -22,6 +25,7 @@ public class CustomApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        CrashWoodpecker.init(this);
 
         mInstance = this;
         context = getApplicationContext();

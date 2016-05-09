@@ -1,4 +1,4 @@
-package com.wanghao.myarchitecture.network;
+package com.dlut.wanghao.myarchitecture.network;
 
 import com.android.volley.Cache;
 import com.android.volley.Request;
@@ -6,8 +6,8 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
-import com.wanghao.myarchitecture.CustomApplication;
-import com.wanghao.myarchitecture.utils.CacheUtils;
+import com.dlut.wanghao.myarchitecture.CustomApplication;
+import com.dlut.wanghao.myarchitecture.utils.CacheUtils;
 
 /**
  * Created by wanghao on 2015/9/22.

@@ -2,6 +2,7 @@ package com.wanghao.myarchitecture.ui.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
@@ -11,35 +12,36 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Response;
+
 import com.android.volley.VolleyError;
+import com.dlut.wanghao.myarchitecture.utils.NetUtils;
 import com.wanghao.myarchitecture.R;
 import com.wanghao.myarchitecture.adapter.HeaderBottomItemAdapter;
 import com.wanghao.myarchitecture.enums.TYPE_LAYOUT;
-import com.wanghao.myarchitecture.network.GsonRequest;
-import com.wanghao.myarchitecture.utils.NetUtils;
 import com.wanghao.myarchitecture.view.LoadingFooter;
 import com.wanghao.myarchitecture.view.LoadingLayout;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import in.srain.cube.views.ptr.PtrClassicFrameLayout;
 import in.srain.cube.views.ptr.PtrDefaultHandler;
 import in.srain.cube.views.ptr.PtrFrameLayout;
 import in.srain.cube.views.ptr.PtrHandler;
-import java.util.ArrayList;
 
 /**
  * Created by wanghao on 2015/9/23.
  */
-public abstract class BaseRefreshListFragment<T> extends BaseFragment{
+public abstract class BaseRefreshListFragment<T> extends Fragment implements BaseRefreshListContract.View<T>{
 
     private Context context;
+    private BaseRefreshListContract.Presenter baseRefreshListPresenter;
     private GridLayoutManager gridLayoutManager;
     private LoadingFooter mLoadingFooter;
     protected ArrayList<T> data;
     private HeaderBottomItemAdapter<T> adapter;
-    private ArrayList<T> result = new ArrayList<T>();
     private boolean isInitLoad = true;//是否第一次加载
     private int mPage = 0;
     private int mCount = 16;
@@ -57,12 +59,15 @@ public abstract class BaseRefreshListFragment<T> extends BaseFragment{
         context = getActivity();
         View view = inflater.inflate(R.layout.ptr_list, container,false);
         ButterKnife.bind(this,view);
+
+        baseRefreshListPresenter = new BaseRefreshListPresenter<>(this,getDataType(),mCount,getUrlString());
+
         //加载视图展示
         loadingLayout.setOnRetryClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 isInitLoad = true;
-                loadFirstPage();
+                baseRefreshListPresenter.loadFirstPage();
             }
         });
 
@@ -81,7 +86,7 @@ public abstract class BaseRefreshListFragment<T> extends BaseFragment{
 
             @Override
             public void onClick() {
-                loadNextPage();
+                baseRefreshListPresenter.loadNextPage(mPage);
             }
         });
 
@@ -104,7 +109,7 @@ public abstract class BaseRefreshListFragment<T> extends BaseFragment{
             @Override
             public void onRefreshBegin(PtrFrameLayout frame) {
                 isInitLoad = false;
-                loadFirstPage();
+                baseRefreshListPresenter.loadFirstPage();
             }
 
             @Override
@@ -130,6 +135,7 @@ public abstract class BaseRefreshListFragment<T> extends BaseFragment{
         return view;
     }
 
+
     RecyclerView.OnScrollListener recyclerScrollListener = new RecyclerView.OnScrollListener(){
 
         @Override
@@ -148,13 +154,12 @@ public abstract class BaseRefreshListFragment<T> extends BaseFragment{
                 firstVisibleItem = ((LinearLayoutManager)layoutManager).findFirstVisibleItemPosition();
             }
 
-
             if (mLoadingFooter.getState() == LoadingFooter.State.Idle) {
                 if (firstVisibleItem + visibleItemCount >= totalItemCount
                         && totalItemCount != 0
                         && totalItemCount != adapter.getHeaderViewCount() + adapter.getBottomViewCount()
                         && adapter.getContentItemCount() > 0) {
-                    loadNextPage();
+                    baseRefreshListPresenter.loadNextPage(mPage);
                 }
             } else if (mLoadingFooter.getState() == LoadingFooter.State.InvalidateNet) {
                 if (!mLoadingFooter.getView().isShown()) {
@@ -165,83 +170,67 @@ public abstract class BaseRefreshListFragment<T> extends BaseFragment{
         }
     };
 
+    @Override
+    public void onLoadResponse(final T[] response, int page) {
 
-
-    private void loadData(final int page) {
-        final boolean isRefreshFromTop = page == 0;
-
-        GsonRequest<T[]> request = new GsonRequest<T[]>(String.format(getUrlString(), page, mCount), getDataType(),
-                new Response.Listener<T[]>() {
-
-                    @Override
-                    public void onResponse(final T[] response) {
-                        for (T t:response) result.add(t);
-                        if (isRefreshFromTop) {
-                            data.clear();
-                            if (isInitLoad) {
-                                if (result.isEmpty()){
-                                    loadingLayout.showEmpty();
-                                }else {
-                                    loadingLayout.showContent();
-                                }
-                            }else {
-                                mPtrFrame.refreshComplete();
-                            }
-                        }
-                        if (result.size() < mCount) {
-                            mLoadingFooter.setState(LoadingFooter.State.TheEnd);
-                        } else {
-                            mLoadingFooter.setState(LoadingFooter.State.Idle);
-                        }
-                        mPage = page;
-                        data.addAll(result);
-                        adapter.notifyDataSetChanged();
-                        result.clear();
-                    }
-                }, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                if (isRefreshFromTop) {
-                    if(isInitLoad){
-                        loadingLayout.showError();
-                    }else{
-                        mPtrFrame.refreshComplete();
-                    }
-                } else {
-                    mLoadingFooter.setState(LoadingFooter.State.Idle);
+        if (page==0) {
+            data.clear();
+            if (isInitLoad) {
+                if (response==null || response.length==0){
+                    loadingLayout.showEmpty();
+                }else {
+                    loadingLayout.showContent();
                 }
-                if (!NetUtils.isConnect(context)) {
-                    if(isRefreshFromTop){
-                        if (data.isEmpty()) {
-                            loadingLayout.showUnnet();
-                        }else {
-                            Toast.makeText(context, "网络异常，请稍后重试", Toast.LENGTH_SHORT).show();
-                        }
-                    }else{
-                        mLoadingFooter.setState(LoadingFooter.State.InvalidateNet);
-                    }
-                }
-
+            }else {
+                mPtrFrame.refreshComplete();
             }
         }
-        );
-
-        request.setRetryPolicy(new DefaultRetryPolicy(20 * 1000, 2, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        executeRequest(request);
-
+        if (response==null || response.length < mCount) {
+            mLoadingFooter.setState(LoadingFooter.State.TheEnd);
+        } else {
+            mLoadingFooter.setState(LoadingFooter.State.Idle);
+        }
+        mPage = page;
+        if (response != null) data.addAll(Arrays.asList(response));
+        adapter.notifyDataSetChanged();
     }
 
-    private void loadNextPage() {
-        mLoadingFooter.setState(LoadingFooter.State.Loading);
-        loadData(mPage+1);
+    @Override
+    public void onLoadError(VolleyError error, int page) {
+
+        boolean isRefreshFromTop = page==0;
+
+        if (isRefreshFromTop) {
+            if(isInitLoad){
+                loadingLayout.showError();
+            }else{
+                mPtrFrame.refreshComplete();
+            }
+        } else {
+            mLoadingFooter.setState(LoadingFooter.State.Idle);
+        }
+        if (!NetUtils.isConnect(context)) {
+            if(isRefreshFromTop){
+                if (data.isEmpty()) {
+                    loadingLayout.showUnnet();
+                }else {
+                    Toast.makeText(context, "网络异常，请稍后重试", Toast.LENGTH_SHORT).show();
+                }
+            }else{
+                mLoadingFooter.setState(LoadingFooter.State.InvalidateNet);
+            }
+        }
     }
 
-    protected void loadFirstPage() {
+    @Override
+    public void onLoadFirst() {
         if (isInitLoad) loadingLayout.showLoading();
         mPage = 0;
-        loadData(mPage);
+    }
+
+    @Override
+    public void onLoadNext() {
+        mLoadingFooter.setState(LoadingFooter.State.Loading);
     }
 
     @Override
@@ -256,9 +245,15 @@ public abstract class BaseRefreshListFragment<T> extends BaseFragment{
         //延迟加载(懒加载)
         if (data != null && data.size() == 0) {
             if(isVisible&&isInit){
-                loadFirstPage();
+                baseRefreshListPresenter.loadFirstPage();
             }
         }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        baseRefreshListPresenter.cancelRequest();
     }
 
     @Override

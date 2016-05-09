@@ -1,4 +1,4 @@
-package com.wanghao.myarchitecture.utils;
+package com.dlut.wanghao.myarchitecture.utils;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

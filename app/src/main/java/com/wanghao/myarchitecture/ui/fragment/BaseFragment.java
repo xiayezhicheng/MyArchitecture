@@ -3,7 +3,7 @@ package com.wanghao.myarchitecture.ui.fragment;
 import android.support.v4.app.Fragment;
 
 import com.android.volley.Request;
-import com.wanghao.myarchitecture.network.RequestManager;
+import com.dlut.wanghao.myarchitecture.network.RequestManager;
 
 /**
  * Created by wanghao on 2015/9/23.
