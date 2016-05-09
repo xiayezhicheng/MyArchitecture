@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.android.databinding'
 
 def releaseTime(){
     return new Date().format("yyyy-MM-dd",TimeZone.getTimeZone("UTC"))
@@ -21,6 +20,10 @@ android {
         // 默认是umeng的渠道
         manifestPlaceholders = [UMENG_CHANNEL_VALUE: "umeng"]
 
+    }
+
+    dataBinding {
+        enabled true
     }
 
     signingConfigs{
